@@ -30,7 +30,7 @@ A simple, beautiful, and persistent calendar built with React and Tailwind CSS t
 
 1.  **Clone the repository:**
     ```bash
-    git clone [https://github.com/your-username/your-repo-name.git](https://github.com/your-username/your-repo-name.git)
+    git clone this-repo
     cd your-repo-name
     ```
 
