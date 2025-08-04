@@ -14,7 +14,7 @@ A simple, beautiful, and persistent calendar built with React and Tailwind CSS t
 -   **Persistent Storage**: Your progress is saved locally in your browser using `localStorage`. 💾
 -   **Easy Navigation**: Jump between months and years with ease. ↔️
 -   **Bulk Actions**: "Mark All" and "Reset" buttons for the current month. 🚀
--   ~~**Dark Mode**: Easy on the eyes with a 🌙/☀️ toggle.~~
+-   ~~**Dark Mode**: Easy on the eyes with a 🌙/☀️ toggle.~~ Doesn't work :P
 
 ---
 
