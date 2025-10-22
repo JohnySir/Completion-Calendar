@@ -37,7 +37,7 @@ function useLocalStorage(key, initialValue) {
  * @returns {object} - An object containing calendar state and functions.
  */
 function useCalendar() {
-    const [currentDate, setCurrentDate] = useState(new Date());
+    const [currentDate, setCurrentDate] = useLocalStorage('currentDate', new Date().toISOString());
     const [completedDays, setCompletedDays] = useLocalStorage('completedDays', {});
 
     const generateCalendarDays = useCallback((date) => {
@@ -66,18 +66,31 @@ function useCalendar() {
 
         return days;
     }, []);
-
-    const calendarDays = generateCalendarDays(currentDate);
+    
+    const date = new Date(currentDate);
+    const calendarDays = generateCalendarDays(date);
 
     const changeMonth = (offset) => {
-        setCurrentDate(prev => new Date(prev.getFullYear(), prev.getMonth() + offset, 1));
+        setCurrentDate(prev => {
+            const newDate = new Date(prev);
+            newDate.setMonth(newDate.getMonth() + offset);
+            return newDate.toISOString();
+        });
     };
 
     const changeYear = (offset) => {
-        setCurrentDate(prev => new Date(prev.getFullYear() + offset, prev.getMonth(), 1));
+        setCurrentDate(prev => {
+            const newDate = new Date(prev);
+            newDate.setFullYear(newDate.getFullYear() + offset);
+            return newDate.toISOString();
+        });
     };
 
-    return { currentDate, completedDays, setCompletedDays, calendarDays, changeMonth, changeYear };
+    const goToToday = () => {
+        setCurrentDate(new Date().toISOString());
+    }
+
+    return { currentDate: date, completedDays, setCompletedDays, calendarDays, changeMonth, changeYear, goToToday };
 }
 
 
@@ -93,7 +106,7 @@ const getDateKey = (date) => {
 
 // --- React Components ---
 
-const CalendarHeader = ({ currentDate, onPrevYear, onNextYear, onPrevMonth, onNextMonth }) => {
+const CalendarHeader = ({ currentDate, onPrevYear, onNextYear, onPrevMonth, onNextMonth, onGoToToday }) => {
     const monthName = currentDate.toLocaleString('default', { month: 'long' });
     const year = currentDate.getFullYear();
 
@@ -103,9 +116,12 @@ const CalendarHeader = ({ currentDate, onPrevYear, onNextYear, onPrevMonth, onNe
                 <button onClick={onPrevYear} className="px-3 py-1 bg-gray-200 dark:bg-gray-700 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">&laquo; Year</button>
                 <button onClick={onPrevMonth} className="px-3 py-1 bg-gray-200 dark:bg-gray-700 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">&lsaquo; Month</button>
             </div>
-            <h2 className="text-xl md:text-2xl font-bold text-gray-800 dark:text-gray-100 text-center">
-                {monthName} {year}
-            </h2>
+            <div className="text-center">
+                <h2 className="text-xl md:text-2xl font-bold text-gray-800 dark:text-gray-100">
+                    {monthName} {year}
+                </h2>
+                <button onClick={onGoToToday} className="text-sm text-blue-500 hover:underline">Go to Today</button>
+            </div>
             <div className="flex items-center space-x-2">
                 <button onClick={onNextMonth} className="px-3 py-1 bg-gray-200 dark:bg-gray-700 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">Month &rsaquo;</button>
                 <button onClick={onNextYear} className="px-3 py-1 bg-gray-200 dark:bg-gray-700 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">Year &raquo;</button>
@@ -141,8 +157,8 @@ const CalendarGrid = ({ days, completedDays, onDayClick }) => {
                             {date.getDate()}
                         </span>
                          {isCompleted && (
-                            <div className="absolute bottom-2 left-2 text-green-600 dark:text-green-400 transition-opacity opacity-0 group-hover:opacity-100">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <div className="absolute inset-0 flex items-center justify-center text-green-600 dark:text-green-400 transition-opacity opacity-0 group-hover:opacity-100 animate-fade-in">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" viewBox="0 0 20 20" fill="currentColor">
                                   <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                                 </svg>
                             </div>
@@ -178,7 +194,7 @@ const ThemeToggleButton = ({ isDarkMode, setIsDarkMode }) => (
  * Main App Component
  */
 function App() {
-    const { currentDate, completedDays, setCompletedDays, calendarDays, changeMonth, changeYear } = useCalendar();
+    const { currentDate, completedDays, setCompletedDays, calendarDays, changeMonth, changeYear, goToToday } = useCalendar();
     const [isDarkMode, setIsDarkMode] = useLocalStorage('isDarkMode', false);
 
     useEffect(() => {
@@ -236,6 +252,7 @@ function App() {
                         onNextYear={() => changeYear(1)}
                         onPrevMonth={() => changeMonth(-1)}
                         onNextMonth={() => changeMonth(1)}
+                        onGoToToday={goToToday}
                     />
                     <CalendarGrid
                         days={calendarDays}
