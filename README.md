@@ -2,7 +2,8 @@
 
 A simple, beautiful, and persistent calendar built with React and Tailwind CSS to track your daily goals and completions. ✨
 
-![Calendar Screenshot](https://github.com/JohnySir/Completion-Calendar/blob/4b8dd927e6c053f88cda8594f7fc3d899529ca5d/images/Screenshot%202025-08-04%20195348.png)
+![Calendar Screenshot](https://raw.githubusercontent.com/JohnySir/Completion-Calendar/refs/heads/main/images/main1.png)
+![Calendar Screenshot2](https://raw.githubusercontent.com/JohnySir/Completion-Calendar/refs/heads/main/images/streaks.png)
 
 ---
 
